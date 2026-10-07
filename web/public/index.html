@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="description" content="El Buen Sabor - pedidos online" />
+  <title>El Buen Sabor</title>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <header class="topbar">
+    <button id="brandBtn" class="brand" type="button" aria-label="Ir al menú">
+      <span class="brand-mark">BS</span>
+      <span>
+        <strong>El Buen Sabor</strong>
+        <small>Pedidos online</small>
+      </span>
+    </button>
+
+    <button id="mobileMenuBtn" class="icon-btn mobile-only" type="button" aria-label="Abrir menú">☰</button>
+
+    <nav id="mainNav" class="nav hidden">
+      <button data-route="menu" class="nav-link">Menú</button>
+      <button data-route="cart" class="nav-link">Carrito <span id="cartBadge" class="badge">0</span></button>
+      <button data-route="orders" class="nav-link">Mis pedidos</button>
+      <button data-route="profile" class="nav-link">Perfil</button>
+      <button id="adminProductsNav" data-route="admin-products" class="nav-link admin-only hidden">Productos</button>
+      <button id="adminOrdersNav" data-route="admin-orders" class="nav-link admin-only hidden">Pedidos</button>
+      <button id="adminUsersNav" data-route="admin-users" class="nav-link admin-only hidden">Usuarios</button>
+      <button id="logoutBtn" class="nav-link danger">Salir</button>
+    </nav>
+  </header>
+
+  <main id="app" class="app-shell"></main>
+
+  <footer class="footer">
+    <span>El Buen Sabor</span>
+    <span>•</span>
+    <span>Android + Web conectados al mismo Firebase</span>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

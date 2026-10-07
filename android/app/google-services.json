@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1035979130445",
+    "project_id": "elbuensabor-994af",
+    "storage_bucket": "elbuensabor-994af.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1035979130445:android:0c866fee2b3308e3f53e04",
+        "android_client_info": {
+          "package_name": "com.example.elbuensabor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0MZvrdLMUSRRpDj64zrig32dKtg5Qpok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

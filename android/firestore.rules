@@ -1,0 +1,103 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isPrimaryAdmin() {
+      return signedIn()
+        && request.auth.token.email == 'admin@elbuensabor.com';
+    }
+
+    function currentUserPath() {
+      return /databases/$(database)/documents/usuarios/$(request.auth.uid);
+    }
+
+    function isAdmin() {
+      return signedIn() && (
+        isPrimaryAdmin() ||
+        (
+          exists(currentUserPath()) &&
+          get(currentUserPath()).data.rol == 'ADMIN'
+        )
+      );
+    }
+
+    function validRole(role) {
+      return role == 'CLIENTE' || role == 'ADMIN';
+    }
+
+    function targetIsPrimaryAdmin(data) {
+      return data.correo == 'admin@elbuensabor.com';
+    }
+
+    match /usuarios/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
+
+      // Registro público: cada usuario puede crear su propio perfil únicamente
+      // como CLIENTE. Excepción: la cuenta principal puede iniciar como ADMIN.
+      // Un administrador también puede crear el documento de un nuevo ADMIN.
+      allow create: if signedIn() && (
+        (
+          request.auth.uid == userId &&
+          request.resource.data.usuarioId == userId &&
+          (
+            (
+              request.auth.token.email == 'admin@elbuensabor.com' &&
+              request.resource.data.correo == 'admin@elbuensabor.com' &&
+              request.resource.data.rol == 'ADMIN'
+            ) ||
+            (
+              request.auth.token.email != 'admin@elbuensabor.com' &&
+              request.resource.data.correo == request.auth.token.email &&
+              request.resource.data.rol == 'CLIENTE'
+            )
+          )
+        ) ||
+        (
+          isAdmin() &&
+          request.resource.data.usuarioId == userId &&
+          validRole(request.resource.data.rol)
+        )
+      );
+
+      // Un usuario normal puede cambiar sus datos de perfil, pero jamás su rol,
+      // UID ni correo. Los administradores pueden cambiar CLIENTE <-> ADMIN.
+      // El administrador principal siempre debe conservar rol ADMIN.
+      allow update: if signedIn() && (
+        (
+          request.auth.uid == userId &&
+          request.resource.data.usuarioId == resource.data.usuarioId &&
+          request.resource.data.correo == resource.data.correo &&
+          request.resource.data.rol == resource.data.rol
+        ) ||
+        (
+          isAdmin() &&
+          request.resource.data.usuarioId == resource.data.usuarioId &&
+          request.resource.data.correo == resource.data.correo &&
+          validRole(request.resource.data.rol) &&
+          (!targetIsPrimaryAdmin(resource.data) || request.resource.data.rol == 'ADMIN')
+        )
+      );
+
+      allow delete: if isAdmin() && !targetIsPrimaryAdmin(resource.data);
+    }
+
+    match /productos/{productoId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /pedidos/{pedidoId} {
+      allow create: if signedIn()
+        && request.resource.data.usuarioId == request.auth.uid;
+
+      allow read: if signedIn()
+        && (resource.data.usuarioId == request.auth.uid || isAdmin());
+
+      allow update, delete: if isAdmin();
+    }
+  }
+}
